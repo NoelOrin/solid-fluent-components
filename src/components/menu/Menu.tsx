@@ -92,6 +92,18 @@ export function MenuTrigger(props: MenuTriggerProps) {
       onClick={(event) => {
         // Prefer enhanced child button; still toggle if click bubbles.
         event.stopPropagation();
+        // A disabled trigger must never open the menu. Native `disabled`
+        // suppresses the button's own handler, so check the DOM here too.
+        const trigger = (event.target as HTMLElement).closest<HTMLElement>(
+          "button, [role='button']",
+        );
+        if (
+          trigger &&
+          ((trigger as HTMLButtonElement).disabled ||
+            trigger.getAttribute("aria-disabled") === "true")
+        ) {
+          return;
+        }
         menu.setOpen(!menu.open());
       }}
     >

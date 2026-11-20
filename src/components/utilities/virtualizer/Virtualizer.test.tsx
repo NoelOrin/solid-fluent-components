@@ -171,6 +171,28 @@ describe("Virtualizer", () => {
     await waitFor(() => expect(keys()).toEqual(["2", "3", "4"]));
   });
 
+  it("reuses the same row DOM nodes while scrolling the visible window", async () => {
+    const { container } = renderWithFluent(() => (
+      <Virtualizer items={[0, 1, 2, 3, 4, 5]} itemSize={24} height={48} overscan={0}>
+        {(item: number) => <div>{item}</div>}
+      </Virtualizer>
+    ));
+    const viewport = container.querySelector<HTMLElement>(".sf-Virtualizer")!;
+    const rows = () =>
+      Array.from(container.querySelectorAll<HTMLElement>(".sf-Virtualizer__item"));
+    const before = rows();
+    expect(before.map((row) => row.getAttribute("data-key"))).toEqual(["0", "1", "2"]);
+
+    viewport.scrollTop = 24;
+    fireEvent.scroll(viewport);
+    await waitFor(() =>
+      expect(rows().map((row) => row.getAttribute("data-key"))).toEqual(["1", "2", "3"]),
+    );
+    expect(rows()[0]).toBe(before[0]);
+    expect(rows()[1]).toBe(before[1]);
+    expect(rows()[2]).toBe(before[2]);
+  });
+
   it("passes the item and its absolute index to children", () => {
     const { container } = renderWithFluent(() => (
       <Virtualizer

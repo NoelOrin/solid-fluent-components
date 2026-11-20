@@ -99,15 +99,16 @@ describe("Button", () => {
     expect(onClick.mock.calls[0]?.[0]).toBeInstanceOf(MouseEvent);
   });
 
-  it("does not invoke onClick while disabled, but stays in the tab order via aria-disabled", () => {
+  it("is natively disabled when disabled, so it leaves the tab order and native form semantics", () => {
     const onClick = vi.fn();
     const { getByRole } = renderWithFluent(() => (
       <Button disabled onClick={onClick}>Go</Button>
     ));
     const btn = getByRole("button") as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
     expect(btn).toHaveAttribute("aria-disabled", "true");
-    expect(btn).not.toHaveAttribute("disabled");
-    expect(btn.tabIndex).toBe(0);
+    btn.focus();
+    expect(document.activeElement).not.toBe(btn);
     fireEvent.click(btn);
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -126,11 +127,13 @@ describe("Button", () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it("stops a disabled button click from reaching ancestor handlers", () => {
+  it("stops a focusable-disabled button click from reaching ancestor handlers", () => {
     const onParentClick = vi.fn();
     const { getByRole } = renderWithFluent(() => (
       <div onClick={onParentClick}>
-        <Button disabled>Go</Button>
+        {/* Native `disabled` suppresses the click entirely in a browser; the
+            aria-only variant still needs the component to stop propagation. */}
+        <Button disabledFocusable>Go</Button>
       </div>
     ));
     fireEvent.click(getByRole("button"));

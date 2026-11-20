@@ -1,5 +1,5 @@
 import {
-  For,
+  Index,
   createEffect,
   createMemo,
   createSignal,
@@ -154,23 +154,23 @@ export function Virtualizer<T>(props: VirtualizerProps<T>) {
       }}
     >
       <div style={{ height: `${total()}px`, position: "relative" }}>
-        <For each={visibleItems()}>
+        <Index each={visibleItems()}>
           {(entry) => (
             <div
               class="sf-Virtualizer__item"
-              data-key={String(entry.key)}
+              data-key={String(entry().key)}
               style={{
                 position: "absolute",
-                top: `${entry.offset}px`,
+                top: `${entry().offset}px`,
                 left: 0,
                 right: 0,
-                height: `${entry.size}px`,
+                height: `${entry().size}px`,
               }}
             >
-              {props.children(entry.item, entry.index)}
+              {props.children(entry().item, entry().index)}
             </div>
           )}
-        </For>
+        </Index>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { splitProps, type JSX } from "solid-js";
+import { onCleanup, splitProps, type JSX } from "solid-js";
 import { callHandler, cx, type IntrinsicElementProps } from "../../utils/index";
 
 export type ButtonAppearance =
@@ -39,11 +39,28 @@ export function Button(props: ButtonProps) {
   const size = () => local.size ?? "medium";
   const iconPosition = () => local.iconPosition ?? "before";
   const isDisabled = () => Boolean(local.disabled || local.disabledFocusable);
+  // Native `disabled` gives correct form/AT semantics and removes the button
+  // from the tab order. `disabledFocusable` opts into the aria-only variant.
+  const nativelyDisabled = () => Boolean(local.disabled) && !local.disabledFocusable;
+
+  // Solid's delegated onClick is skipped for natively disabled buttons, so a
+  // synthetic click could otherwise bubble to ancestors. A native listener on
+  // the element itself still runs and keeps the disabled button inert.
+  const stopDisabledClick = (event: MouseEvent) => {
+    if (!isDisabled()) return;
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   return (
     <button
       type="button"
+      ref={(el) => {
+        el.addEventListener("click", stopDisabledClick);
+        onCleanup(() => el.removeEventListener("click", stopDisabledClick));
+      }}
       {...rest}
+      disabled={nativelyDisabled()}
       class={cx(
         "sf-Button",
         "sf-focus-ring",
