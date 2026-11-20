@@ -4,9 +4,9 @@
 [![Pages](https://github.com/NoelOrin/solid-fluent-components/actions/workflows/pages.yml/badge.svg)](https://noelorin.github.io/solid-fluent-components/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-用 **SolidJS** 重写的 Fluent UI 风格组件库，对标 `@fluentui/react-components` 的主题与常用 API。
+**中文** · [English](#english)
 
-**在线 Storybook（GitHub Pages）**：https://noelorin.github.io/solid-fluent-components/
+在线 Storybook（GitHub Pages）：https://noelorin.github.io/solid-fluent-components/ —— 默认中文，可在工具栏切换 English。
 
 ## 技术栈
 
@@ -87,8 +87,9 @@ playground/       # 本地演示
 ## Storybook
 
 - 在线文档（GitHub Pages）：https://noelorin.github.io/solid-fluent-components/ ，每次 push 到 `main` 由 `.github/workflows/pages.yml` 自动构建并发布；PR 上 `.github/workflows/ci.yml` 也会构建一次做门禁。
+- 默认语言为 **中文**，工具栏「语言 / Locale」可切换 `中文（默认）` / `English`；切换后所有走 `t()` 的组件文案即时更新。
 - 框架：`storybook-solidjs-vite` + Storybook 10
-- 主题切换：工具栏 Light / Dark
+- 主题切换：工具栏 Light / Dark，另有 Web / Violet / Emerald 三套主题族
 - API 说明：`Introduction/API`（MDX 总表）+ 各组件 Story 的 Docs 描述 / Controls
 - 兼容说明：项目编译使用 TypeScript 7；`storybook-solidjs-vite` 的 docgen 依赖 TypeScript 5 API，因此通过 `scripts/pin-storybook-typescript.mjs` 为其固定 TS 5.9，并关闭 docgen。
 - Pages 构建会设置 `GITHUB_PAGES=1`，由 `.storybook/main.ts` 把 Vite `base` 改为 `/<repo>/`，保证子路径部署时静态资源可寻址；本地 `pnpm storybook` 仍走根路径。
@@ -96,7 +97,7 @@ playground/       # 本地演示
 ## 国际化（i18n）
 
 基于 [`x18n`](https://github.com/florian/x18n) 提供全局响应式的翻译函数，内置 `en` / `zh-CN`
-两套组件文案（关闭、清除、移除、上一张/下一张、月份切换等）。默认语言为 `en`。
+两套组件文案（关闭、清除、移除、上一张/下一张、月份切换等）。默认语言为 `en`；Storybook 中默认 `zh-CN`。
 
 ```tsx
 import { I18nProvider, setLocale, t } from "@solid-fluent/components";
@@ -150,3 +151,155 @@ API：`t(key, ...args)`、`tp(key, n)`（复数）、`setLocale()`、`getLocale(
 - `GITHUB_TOKEN`：GitHub Actions 内置令牌，workflow 已声明 `contents: write`，无需手动配置。
 
 changeset 合并到 `main` 后，在 GitHub 的 **Actions -> Release -> Run workflow** 中输入 `confirm: release` 并运行。CI 会依次执行类型检查、测试、npm 构建、Storybook 构建，随后生成版本和完整 `CHANGELOG.md`、发布 npm 包、创建 `v*` 标签及 GitHub Release，并上传 `dist.tar.gz`。没有待发布 changeset 时，流程会主动失败且不会发布。
+
+---
+
+## English
+
+A SolidJS rewrite of Fluent UI style components, targeting the theming and common APIs of `@fluentui/react-components`.
+
+[中文](#solid-fluent-components) · **English**
+
+Live Storybook (GitHub Pages): https://noelorin.github.io/solid-fluent-components/ — Chinese by default; switch to English from the toolbar.
+
+### Tech stack
+
+- SolidJS 1.9
+- Vite 8
+- TypeScript 7
+- `@floating-ui/dom` (Menu / Tooltip / Popover positioning)
+
+### Getting started
+
+```bash
+pnpm install
+
+# typecheck
+pnpm typecheck
+
+# build the library
+pnpm build
+
+# Storybook component docs
+pnpm storybook
+pnpm build-storybook
+```
+
+Storybook locally: `http://localhost:6006`
+
+### Usage
+
+```tsx
+import {
+  Button,
+  FluentProvider,
+  webLightTheme,
+} from "@solid-fluent/components";
+import "@solid-fluent/components/styles.css";
+
+export default function App() {
+  return (
+    <FluentProvider theme={webLightTheme}>
+      <Button appearance="primary">Hello Fluent</Button>
+    </FluentProvider>
+  );
+}
+```
+
+### Implemented
+
+- Theming: `FluentProvider`, `webLightTheme`, `webDarkTheme`, `tokens`
+- Inputs: `Button`, `CompoundButton`, `ToggleButton`, `SplitButton`, `MenuButton`, `Input`, `SearchBox`, `Textarea`, `Checkbox`, `Radio`, `RadioGroup`, `Switch`, `SpinButton`, `Select`, `Dropdown`, `ComboboxField`, `Slider`, `Rating`, `Field`, `Label`, `InfoLabel`
+- Display: `Text`/`Title*`, `Avatar`, `AvatarGroup`, `PresenceBadge`, `Badge`, `Spinner`, `Card`, `Skeleton`, `ProgressBar`, `Persona`, `Tag`, `TagPicker`, `InteractionTag`, `Image`, `Divider`, `Link`, `SwatchPicker`, `EmptyState`
+- Feedback: `Dialog`, `Drawer`, `InlineDrawer`, `MessageBar`, `Toast`/`Toaster`, `TeachingPopover`
+- Navigation: `TabList`/`Tab`, `Accordion`, `Breadcrumb`, `Toolbar`, `Menu`, `Nav`, `AppItem`, `Pagination`, `Stepper`
+- Overlay: `Tooltip`, `Popover`/`PopoverTrigger`/`PopoverSurface`, `SimplePopover`, `Portal`, `Carousel`
+- Pickers: `ColorPicker`/`ColorArea`/`ColorSlider`/`AlphaSlider`, `DatePicker`/`Calendar`, `TimePicker`
+- Data: `Table`, `DataGrid`, `Tree`, `List`, `Virtualizer`, `Overflow`
+- Layout: `Stack`
+
+### Structure
+
+```text
+src/
+  theme/          # theme tokens and Provider
+  components/     # organized by Fluent UI Storybook Components
+    button/       # Button / CompoundButton / MenuButton / SplitButton / ToggleButton
+    card/         # Card / CardHeader / CardPreview / CardFooter
+    badge/        # Badge / CounterBadge / PresenceBadge
+    tag/          # Tag / TagGroup / InteractionTag
+    drawer/       # Drawer / InlineDrawer / OverlayDrawer
+    tree/         # Tree / FlatTree
+    motion/       # PresenceGroup
+    utilities/    # ARIA live / Overlay / Pagination / Stack / Virtualizer
+    stories/      # Storybook stories
+  styles/         # Fluent-style CSS
+  utils/          # utilities
+playground/       # local demo
+```
+
+### Storybook
+
+- Online docs (GitHub Pages): https://noelorin.github.io/solid-fluent-components/ — built and deployed on every push to `main` by `.github/workflows/pages.yml`; PRs are also gated by a Storybook build in `.github/workflows/ci.yml`.
+- The default locale is **Chinese**; use the "语言 / Locale" toolbar to switch between `中文（默认）` and `English`. All `t()`-backed strings update immediately.
+- Framework: `storybook-solidjs-vite` + Storybook 10
+- Theming: Light / Dark toolbar plus the Web / Violet / Emerald theme families
+- API docs: `Introduction/API` (MDX index) plus Docs descriptions / Controls on each story
+- Compatibility note: the project compiles with TypeScript 7, while `storybook-solidjs-vite` docgen needs the TypeScript 5 API, so `scripts/pin-storybook-typescript.mjs` pins TS 5.9 for it and disables docgen.
+- Pages builds set `GITHUB_PAGES=1`, which makes `.storybook/main.ts` use `/<repo>/` as Vite `base` so assets resolve under the project subpath; local `pnpm storybook` still uses the root path.
+
+### Internationalization (i18n)
+
+Built on [`x18n`](https://github.com/florian/x18n), providing a globally reactive translation function with built-in `en` / `zh-CN` component strings (close, clear, remove, next/previous, month navigation, etc.). The library default is `en`; Storybook defaults to `zh-CN`.
+
+```tsx
+import { I18nProvider, setLocale, t } from "@solid-fluent/components";
+import "@solid-fluent/components/styles.css";
+
+// Global switch: every t() consumer updates automatically
+setLocale("zh-CN");
+
+// Scoped subtree (set on enter, restore on unmount)
+<I18nProvider locale="zh-CN">
+  <App />
+</I18nProvider>;
+
+// Custom / overridden entries
+t("common.close"); // "关闭" (follows the current locale)
+```
+
+API: `t(key, ...args)`, `tp(key, n)` (plural), `setLocale()`, `getLocale()`,
+`availableLocales()`, `registerDictionary(locale, dict)`, `I18nProvider`, `useI18n()`.
+`x18n` supports `%1` positional interpolation, `%{name}` named interpolation and `plural(n)`; component strings go through `t()`, and app strings can be added with `registerDictionary`. `t()` reads a signal, so Solid JSX re-renders automatically when the locale changes.
+
+### Polished interactions
+
+- Combobox: multi-select tags, filtering, Arrow / Home / End / Enter / Esc / Backspace
+- Dropdown: keyboard open, highlight, type-ahead
+- List / Menu / Dialog: keyboard navigation, focus trap, Esc to close
+- DatePicker: calendar keyboard roaming, `DateRangePicker` / `CalendarDateRange`
+- DataGrid: `virtualized` scrolling, row keyboard navigation, sorting and multi-select
+- Shared a11y helpers: `createFocusTrap`, `moveActiveIndex`, `getFocusableElements`
+
+### Notes
+
+This is a working Solid rewrite skeleton with high-frequency components. The API stays close to Fluent UI v9 but is not a complete 1:1 compatibility layer. Future work can complete `DataGrid`, `Tree`, `Combobox` interactions and `DatePicker`.
+
+### Releasing
+
+Releases use Changesets. Add a changeset for every change that should ship:
+
+```md
+---
+"@solid-fluent/components": patch
+---
+
+Fix component behavior.
+```
+
+Required Actions secrets:
+
+- `NPM_TOKEN`: npm publish token (configure in repo Settings -> Secrets).
+- `GITHUB_TOKEN`: built into GitHub Actions; the workflow already declares `contents: write`, no manual setup needed.
+
+Once the changeset is merged into `main`, go to GitHub **Actions -> Release -> Run workflow** and enter `confirm: release`. CI runs typecheck, tests, the npm build and the Storybook build, then versions the package, generates the full `CHANGELOG.md`, publishes to npm, creates a `v*` tag and a GitHub Release, and uploads `dist.tar.gz`. With no pending changesets the workflow fails intentionally instead of publishing.

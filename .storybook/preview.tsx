@@ -1,9 +1,11 @@
 import type { Preview } from "storybook-solidjs-vite";
 import { createJSXDecorator } from "storybook-solidjs-vite";
+import { createEffect } from "solid-js";
 import {
   FluentProvider,
   getThemePreset,
   resolveThemeFamily,
+  setLocale,
   type ColorMode,
 } from "../src";
 import "../src/styles/fluent.css";
@@ -14,6 +16,8 @@ const withFluentProvider = createJSXDecorator((Story, context) => {
   const mode: ColorMode = (context.globals.theme as string) === "dark" ? "dark" : "light";
   const theme = getThemePreset(family, mode);
   const fullscreen = context.parameters?.layout === "fullscreen";
+  const locale = () => (context.globals.locale as string) || "zh-CN";
+  createEffect(() => setLocale(locale()));
 
   return (
     <FluentProvider
@@ -62,6 +66,19 @@ const preview: Preview = {
     },
   },
   globalTypes: {
+    locale: {
+      name: "语言 / Locale",
+      description: "Component language (i18n)",
+      defaultValue: "zh-CN",
+      toolbar: {
+        icon: "globe",
+        items: [
+          { value: "zh-CN", title: "中文（默认）" },
+          { value: "en", title: "English" },
+        ],
+        dynamicTitle: true,
+      },
+    },
     themeFamily: {
       name: "主题族",
       description: "Theme preset family",
