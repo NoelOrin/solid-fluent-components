@@ -78,6 +78,30 @@ describe("DataGrid", () => {
     expect(row.getAttribute("aria-selected")).toBe("false");
   });
 
+  it("keeps the selection attached to the same row after sorting", () => {
+    const sortItems = [{ name: "Zoe" }, { name: "Ada" }];
+    const { container } = renderWithFluent(() => (
+      <DataGrid
+        items={sortItems}
+        columns={sortColumns}
+        sortable
+        selectionMode="multiselect"
+        selectedItems={[0]}
+      />
+    ));
+    const rowFor = (name: string) =>
+      Array.from(container.querySelectorAll<HTMLElement>(".sf-DataGrid__row")).find((row) =>
+        row.textContent?.includes(name),
+      )!;
+    expect(rowFor("Zoe").getAttribute("aria-selected")).toBe("true");
+
+    const header = container.querySelector<HTMLElement>('[role="columnheader"][aria-sort]')!;
+    fireEvent.click(header);
+
+    expect(rowFor("Zoe").getAttribute("aria-selected")).toBe("true");
+    expect(rowFor("Ada").getAttribute("aria-selected")).toBe("false");
+  });
+
   it("moves the active row with the keyboard and reflects it via aria-activedescendant", () => {
     const { container, getByRole } = renderWithFluent(() => (
       <DataGrid
