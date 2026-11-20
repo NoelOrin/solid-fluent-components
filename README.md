@@ -150,7 +150,7 @@ API：`t(key, ...args)`、`tp(key, n)`（复数）、`setLocale()`、`getLocale(
 - `NPM_TOKEN`：npm 发布令牌（需在仓库 Settings -> Secrets 中配置）。
 - `GITHUB_TOKEN`：GitHub Actions 内置令牌，workflow 已声明 `contents: write`，无需手动配置。
 
-changeset 合并到 `main` 后，在 GitHub 的 **Actions -> Release -> Run workflow** 中输入 `confirm: release` 并运行。CI 会依次执行类型检查、测试、npm 构建、Storybook 构建，随后生成版本和完整 `CHANGELOG.md`、发布 npm 包、创建 `v*` 标签及 GitHub Release，并上传 `dist.tar.gz`。没有待发布 changeset 时，流程会主动失败且不会发布。
+changeset 合并到 `main` 后流程全自动，无需手动触发：Release workflow 会自动创建（或更新）一个 **Version Packages** PR，包含版本号提升与生成的 `CHANGELOG.md`；该 PR 合并回 `main` 后自动执行类型检查、测试、npm 构建并发布 npm 包，随后打 `@solid-fluent/components@x.y.z` 标签并创建 GitHub Release。没有待发布 changeset 时 workflow 空跑，不会发布。
 
 ---
 
@@ -302,4 +302,4 @@ Required Actions secrets:
 - `NPM_TOKEN`: npm publish token (configure in repo Settings -> Secrets).
 - `GITHUB_TOKEN`: built into GitHub Actions; the workflow already declares `contents: write`, no manual setup needed.
 
-Once the changeset is merged into `main`, go to GitHub **Actions -> Release -> Run workflow** and enter `confirm: release`. CI runs typecheck, tests, the npm build and the Storybook build, then versions the package, generates the full `CHANGELOG.md`, publishes to npm, creates a `v*` tag and a GitHub Release, and uploads `dist.tar.gz`. With no pending changesets the workflow fails intentionally instead of publishing.
+Once the changeset is merged into `main`, everything runs automatically — no manual trigger: the Release workflow opens (or updates) a **Version Packages** PR carrying the version bump and generated `CHANGELOG.md`. When that PR is merged back into `main`, CI runs typecheck, tests and the npm build, publishes to npm, then tags `@solid-fluent/components@x.y.z` and creates a GitHub Release. With no pending changesets the workflow is a no-op and never publishes.
