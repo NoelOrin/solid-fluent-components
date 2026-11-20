@@ -1,0 +1,119 @@
+name: Release
+
+# Manual, confirmed release: typecheck/test/build, apply the pending changeset,
+# publish to npm, push the version commit + tag, then cut a GitHub release.
+#
+# This used to be a Gitea workflow: it ran y.* scripts (the repo is pnpm) and
+# used ${{ gitea.* }} contexts, so on GitHub Actions the file was invalid and
+# every push produced a zero-job red run. Ported to GitHub semantics.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "输入 release 确认发版"
+        required: true
+        type: string
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ inputs.confirm == 'release' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.7.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build package
+        run: pnpm build
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - name: Check pending changesets
+        run: |
+          pnpm exec changeset status --output /tmp/changeset-status.json
+          node --input-type=module <<'NODE'
+          import { readFileSync } from "node:fs";
+
+          const status = JSON.parse(readFileSync("/tmp/changeset-status.json", "utf8"));
+          if (!status.releases?.length) {
+            console.error("没有待发布 changeset，已停止发版。");
+            process.exit(1);
+          }
+          NODE
+
+      - name: Apply version and changelog
+        run: pnpm exec changeset version
+
+      - name: Read release metadata
+        id: metadata
+        run: |
+          VERSION=$(node -p "JSON.parse(require('fs').readFileSync('package.json','utf8')).version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          tar -czf dist.tar.gz dist
+
+      - name: Publish package to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm publish --access public --no-git-checks
+
+      - name: Commit version and tag
+        env:
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          git config user.name "NoelOrin"
+          git config user.email "noelorin@outlook.com"
+          git add package.json pnpm-lock.yaml CHANGELOG.md .changeset
+          git commit -m "chore(release): v$VERSION"
+          git tag "v$VERSION"
+          git push origin HEAD:main --follow-tags
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+        run: |
+          mkdir -p /tmp/notes
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from "node:fs";
+
+          const changelog = readFileSync("CHANGELOG.md", "utf8");
+          const version = process.env.VERSION;
+          const escaped = version.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const section =
+            changelog.match(
+              new RegExp(`^## [^\\n]*${escaped}[^\\n]*\\n[\\s\\S]*?(?=^## |(?![\\s\\S]))`, "m"),
+            )?.[0] ?? `## ${version}`;
+          writeFileSync("/tmp/notes/release.md", `${section.trim()}\\n`);
+          NODE
+          gh release create "v$VERSION" dist.tar.gz --title "v$VERSION" --notes-file /tmp/notes/release.md

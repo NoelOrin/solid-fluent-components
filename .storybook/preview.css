@@ -1,0 +1,151 @@
+/*
+ * Storybook 画布 / Docs 的视觉润色。
+ * 颜色优先取 FluentProvider 写到 documentElement 上的 --sf-* 令牌，
+ * 因此顶部工具栏切换 Light / Dark 时画布与文档会一起换肤。
+ */
+
+:root {
+  --sf-sb-radius: 14px;
+  --sf-sb-shadow: 0 1px 2px rgba(15, 36, 62, 0.06), 0 12px 32px rgba(15, 36, 62, 0.08);
+}
+
+@supports (color: color-mix(in srgb, red 50%, transparent)) {
+  :root {
+    --sf-sb-shadow: 0 1px 2px color-mix(in srgb, var(--sf-colorNeutralForeground1) 8%, transparent),
+      0 14px 36px color-mix(in srgb, var(--sf-colorNeutralForeground1) 10%, transparent);
+  }
+}
+
+/* ---------- 画布背景 ---------- */
+body.sb-show-main {
+  background-color: var(--sf-colorNeutralBackground2, #eef2f7);
+}
+
+@supports (background: color-mix(in srgb, red 50%, transparent)) {
+  body.sb-show-main {
+    background-image:
+      radial-gradient(
+        760px 380px at 8% -12%,
+        color-mix(in srgb, var(--sf-colorBrandBackground) 18%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        620px 320px at 100% 0%,
+        color-mix(in srgb, var(--sf-colorBrandBackground2, var(--sf-colorBrandBackground)) 42%, transparent),
+        transparent 68%
+      );
+    background-attachment: fixed;
+  }
+}
+
+/* 每个 Story 外面包一层轻量的展示卡片，组件本身无需改动 */
+.sf-sb-surface {
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  border-radius: var(--sf-sb-radius);
+  box-shadow: var(--sf-sb-shadow);
+  overflow: hidden;
+}
+
+/* ---------- Docs 排版 ---------- */
+#storybook-docs .sbdocs-wrapper {
+  padding-top: 8px;
+}
+
+#storybook-docs .sbdocs-content {
+  max-width: 960px;
+}
+
+.sbdocs h1,
+.sbdocs h2,
+.sbdocs h3,
+.sbdocs h4 {
+  color: var(--sf-colorNeutralForeground1, #1b2430);
+  letter-spacing: -0.02em;
+}
+
+.sbdocs h1 {
+  font-size: 32px;
+  line-height: 1.2;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+}
+
+.sbdocs h2 {
+  font-size: 24px;
+  margin-top: 32px;
+}
+
+.sbdocs p,
+.sbdocs li {
+  line-height: 1.75;
+}
+
+.sbdocs a {
+  color: var(--sf-colorBrandForeground1, #0f6cbd);
+  text-decoration: none;
+}
+
+.sbdocs a:hover {
+  text-decoration: underline;
+}
+
+.sbdocs code {
+  font-family: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 0.9em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--sf-colorNeutralBackground3, #f0f3f7);
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+}
+
+.sbdocs pre {
+  border-radius: 10px;
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  box-shadow: 0 2px 10px rgba(15, 36, 62, 0.05);
+}
+
+.sbdocs pre code {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.sbdocs table {
+  display: table;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.sbdocs table th,
+.sbdocs table td {
+  border-bottom: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  border-right: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  padding: 8px 12px;
+}
+
+.sbdocs table th:last-child,
+.sbdocs table td:last-child {
+  border-right: 0;
+}
+
+.sbdocs table tr:last-child td {
+  border-bottom: 0;
+}
+
+.sbdocs table th {
+  background: var(--sf-colorNeutralBackground3, #f0f3f7);
+  font-weight: 600;
+}
+
+.sbdocs blockquote {
+  margin: 16px 0;
+  padding: 10px 16px;
+  border-left: 4px solid var(--sf-colorBrandStroke1, #0f6cbd);
+  border-radius: 0 8px 8px 0;
+  background: var(--sf-colorBrandBackground2, #ebf3fc);
+  color: var(--sf-colorNeutralForeground2, #5f6b7a);
+}

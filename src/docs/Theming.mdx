@@ -1,0 +1,135 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import * as ThemeStories from "../components/stories/Theme.stories";
+
+<Meta title="Introduction/主题" />
+
+# 主题
+
+主题由 `FluentProvider`、主题对象和设计令牌组成。组件只读取当前 Provider 提供的主题变量，因此切换主题不需要逐个修改组件。
+
+## 浅色与深色主题
+
+库内置 `webLightTheme` 和 `webDarkTheme`：
+
+```tsx
+import {
+  Button,
+  FluentProvider,
+  webDarkTheme,
+  webLightTheme,
+} from "@solid-fluent/components";
+
+<FluentProvider theme={webLightTheme}>
+  <Button appearance="primary">浅色主题</Button>
+</FluentProvider>;
+
+<FluentProvider theme={webDarkTheme}>
+  <Button appearance="primary">深色主题</Button>
+</FluentProvider>;
+```
+
+在本 Storybook 中，顶部工具栏的 `Theme` 控件会切换全局 Light / Dark 主题。
+
+<Canvas of={ThemeStories.LightAndDark} />
+
+## 三套主题族
+
+除默认的 `web`（品牌蓝）外，库还内置 `violet`（紫罗兰）与 `emerald`（祖母绿）两套主题族，每套均有完整的 light / dark 版本，令牌集合完全一致。
+
+```tsx
+import { getThemePreset, resolveThemeFamily, FluentProvider } from "@solid-fluent/components";
+
+const family = resolveThemeFamily(toolbarValue); // 未知值兜底为 "web"
+<FluentProvider theme={getThemePreset(family, "dark")}>{children}</FluentProvider>;
+```
+
+运行时元信息表 `themePresetFamilies`（`{ id, label, light, dark }[]`）可直接驱动下拉菜单；具名主题 `violetLightTheme` / `violetDarkTheme` / `emeraldLightTheme` / `emeraldDarkTheme` 也可单独导入。品牌 ramp 为 `brandWeb` / `brandViolet` / `brandEmerald`。
+
+<Canvas of={ThemeStories.ThemeFamilies} />
+
+## FluentProvider
+
+| 属性 | 类型 | 默认值 | 用途 |
+| --- | --- | --- | --- |
+| `theme` | `Theme` | `webLightTheme` | 当前主题对象 |
+| `themeOverrides` | `PartialTheme` | - | 在当前主题上覆盖令牌 |
+| `applyToDocument` | `boolean` | `false` | 是否同步到 `targetDocument.documentElement` |
+| `targetDocument` | `Document` | `document` | 写入主题变量的目标文档（如 iframe），仅在 `applyToDocument` 时生效 |
+| `as` | `keyof JSX.IntrinsicElements` | `"div"` | 替换容器标签，其余行为不变 |
+| `dir` | `"ltr" \| "rtl"` | `"ltr"` | 书写方向 |
+| `class` / `style` | - | - | Provider 容器样式 |
+
+## 设计令牌
+
+在 TSX 中可以直接使用 `tokens`：
+
+```tsx
+import { Body1, tokens } from "@solid-fluent/components";
+
+<Body1 style={{ color: tokens.colorNeutralForeground2 }}>
+  次要文字
+</Body1>;
+```
+
+也可以在 CSS 中使用 Provider 注入的变量。变量名会保留 token 键名，并添加 `--sf-` 前缀：
+
+```css
+.custom-panel {
+  background: var(--sf-colorNeutralBackground1);
+  color: var(--sf-colorNeutralForeground1);
+  border-color: var(--sf-colorNeutralStroke1);
+  border-radius: var(--sf-borderRadiusMedium);
+}
+```
+
+常用令牌包括：
+
+| 类型 | 示例 |
+| --- | --- |
+| 品牌色 | `colorBrandBackground`、`colorBrandForeground1` |
+| 中性前景 | `colorNeutralForeground1`、`colorNeutralForeground2` |
+| 中性背景 | `colorNeutralBackground1`、`colorNeutralBackground2` |
+| 描边 | `colorNeutralStroke1`、`colorNeutralStrokeAccessible` |
+| 字体 | `fontFamilyBase`、`fontSizeBase300`、`fontWeightSemibold` |
+| 圆角 | `borderRadiusSmall`、`borderRadiusMedium`、`borderRadiusCircular` |
+
+## 自定义品牌色
+
+通过 `brandWeb` 和主题工厂创建自定义主题：
+
+```tsx
+import {
+  FluentProvider,
+  brandWeb,
+  createDarkTheme,
+  createLightTheme,
+} from "@solid-fluent/components";
+
+const brand = {
+  ...brandWeb,
+  80: "#0f6cbd",
+  100: "#479ef5",
+};
+
+const lightTheme = createLightTheme(brand);
+const darkTheme = createDarkTheme(brand);
+
+<FluentProvider theme={lightTheme}>
+  {children}
+</FluentProvider>;
+```
+
+## 局部主题
+
+Provider 可以嵌套。内层 Provider 只影响自己的子树，适合在设置页、预览区或嵌入式模块中使用局部主题。
+
+```tsx
+<FluentProvider theme={webLightTheme}>
+  <PageContent />
+  <FluentProvider theme={webDarkTheme}>
+    <DarkPreview />
+  </FluentProvider>
+</FluentProvider>
+```
+
+嵌套 Provider 时，局部区域建议保持 `applyToDocument={false}`。若确实有多个 Provider 开启 `applyToDocument`，库内部只让最外层生效；当最外层卸载或关闭时，所有权会通过响应式 signal 自动移交给下一个 Provider，并清理旧的 CSS 变量，不会残留上一次的主题值。

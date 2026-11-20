@@ -1,0 +1,86 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction/安装" />
+
+# 安装与快速开始
+
+`@solid-fluent/components` 是面向 SolidJS 的 Fluent UI 风格组件库。推荐在应用根部放置一个 `FluentProvider`，让所有组件共享主题和书写方向。
+
+## 安装
+
+```bash
+npm install @solid-fluent/components solid-js
+```
+
+`solid-js` 是运行时 peer dependency。使用 Yarn 时也可以执行：
+
+```bash
+yarn add @solid-fluent/components solid-js
+```
+
+## 引入样式
+
+在应用入口引入组件库样式：
+
+```tsx
+import "@solid-fluent/components/styles.css";
+```
+
+## 最小应用
+
+```tsx
+import {
+  Button,
+  FluentProvider,
+  webLightTheme,
+} from "@solid-fluent/components";
+import "@solid-fluent/components/styles.css";
+
+export default function App() {
+  return (
+    <FluentProvider theme={webLightTheme} applyToDocument>
+      <Button appearance="primary">开始使用</Button>
+    </FluentProvider>
+  );
+}
+```
+
+`FluentProvider` 会把主题转换为组件使用的 CSS 变量。`applyToDocument` 设为 `true` 时，变量也会写入 `document.documentElement`，适合应用级主题；局部主题区域可以省略该属性。
+
+## 控件状态
+
+支持受控和非受控两种使用方式。需要由业务状态驱动时使用 `value` / `checked` 与对应事件；只需要设置初始值时使用 `defaultValue` / `defaultChecked`。
+
+```tsx
+import { createSignal } from "solid-js";
+import { Input } from "@solid-fluent/components";
+
+export function ControlledInput() {
+  const [value, setValue] = createSignal("");
+
+  return (
+    <Input
+      value={value()}
+      onInput={(event) => setValue(event.currentTarget.value)}
+      placeholder="输入内容"
+    />
+  );
+}
+```
+
+## 本地开发
+
+在仓库中运行以下命令查看组件 Playground 或 Storybook：
+
+```bash
+npm run dev
+npm run storybook
+```
+
+构建发布前建议执行类型检查、库构建和 Storybook 构建：
+
+```bash
+npm run typecheck
+npm run build
+npm run build-storybook
+```

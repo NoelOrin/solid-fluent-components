@@ -1,0 +1,21 @@
+node_modules
+dist
+storybook-static
+.DS_Store
+*.local
+.vite
+coverage
+*.log
+.idea
+.vscode
+
+# 禁止 PnP 链接（Yarn Plug'n'Play 相关文件）
+.pnp.cjs
+.pnp.loader.mjs
+.pnp
+.yarn/unplugged
+.yarn/install-state.gz
+.yarn/cache
+.yarn/build-state.yml
+.yarn/releases
+.yarn/sdks

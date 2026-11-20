@@ -1,0 +1,82 @@
+import { Meta, Canvas } from "@storybook/addon-docs/blocks";
+import * as FieldStories from "../components/stories/Field.stories";
+import * as PolishStories from "../components/stories/Polish.stories";
+
+<Meta title="Introduction/无障碍" />
+
+# 无障碍使用说明
+
+组件库提供语义元素、ARIA 属性、焦点样式和常见键盘交互的基础支持。业务应用仍然需要提供准确的标签、状态文案和可操作的交互顺序。
+
+## 文本标签
+
+图标按钮必须提供可访问名称。只有装饰用途的图标才应设置 `aria-hidden="true"`：
+
+```tsx
+<Button
+  icon={<SearchIcon aria-hidden="true" />}
+  aria-label="搜索"
+  appearance="subtle"
+  shape="circular"
+/>
+```
+
+表单控件优先放进 `Field`，由它统一管理标签、提示和校验信息：
+
+```tsx
+<Field label="邮箱" required hint="用于接收通知">
+  <Input type="email" />
+</Field>
+```
+
+`Field` 会为子控件提供关联 id，标签会通过 `for` 指向该控件；错误信息使用 `role="alert"`，警告和成功信息使用 `role="status"`。如果业务需要让辅助技术自动读取提示或校验文案，请额外将对应文案 id 通过 `aria-describedby` 关联到控件。
+
+<Canvas of={FieldStories.Default} />
+
+## 键盘操作
+
+使用组件时应确保完整流程可以只用键盘完成：
+
+| 组件类型 | 重点操作 |
+| --- | --- |
+| Button / Input | `Tab` 聚焦，`Enter` 或 `Space` 执行按钮操作 |
+| Menu / Dropdown | `Enter` 或 `Space` 打开，方向键移动，`Escape` 关闭 |
+| Combobox | 输入过滤，方向键移动，`Enter` 选择，`Escape` 关闭 |
+| Dialog / Drawer | 打开后焦点进入容器，`Tab` 在容器内循环，`Escape` 关闭 |
+| Tabs / Tree / DataGrid | 使用方向键在同一组件内部移动焦点 |
+
+仓库中的 `Polish` stories 提供了组合框、下拉、列表、日期范围和虚拟表格的键盘交互示例：
+
+<Canvas of={PolishStories.ComboboxKeyboard} />
+
+## 焦点与顺序
+
+- 不要用 `tabIndex` 制造不符合阅读顺序的焦点跳转。
+- 不要移除 `.sf-focus-ring` 提供的可见焦点样式，除非你提供了等价或更清晰的替代样式。
+- 弹窗、抽屉等模态容器打开后，应让用户能通过 `Tab` 遍历内部控件，并通过 `Escape` 返回原流程。
+- 禁用控件不能被操作；如果需要保留键盘焦点但阻止操作，可使用组件支持的 `disabledFocusable` 能力。
+
+## 状态表达
+
+视觉状态必须有对应的语义状态或文本说明：
+
+```tsx
+<Field
+  label="用户名"
+  validationState="error"
+  validationMessage="用户名已被占用"
+>
+  <Input invalid />
+</Field>
+```
+
+不要只依赖颜色区分成功、警告和错误；同时提供文字、图标的可访问名称或其他明确提示。
+
+## 自定义内容检查清单
+
+- 交互元素是否有可访问名称？
+- 图片是否有准确的 `alt`，装饰图片是否隐藏？
+- 表单控件是否有可见标签或等价的 `aria-label`？
+- 展开、选中、禁用和错误状态是否能被辅助技术感知？
+- 是否可以仅使用键盘完成主要流程？
+- 焦点是否始终可见，并且没有被浮层或滚动容器遮挡？

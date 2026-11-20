@@ -1,0 +1,178 @@
+/* Storybook 欢迎页专属样式（不进入组件库构建产物） */
+
+.sf-welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: min(920px, 100%);
+}
+
+.sf-welcome-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 34px 36px 32px;
+  border-radius: 18px;
+  color: #ffffff;
+  background: linear-gradient(128deg, #082338 0%, #0f6cbd 58%, #2886de 100%);
+  box-shadow: 0 16px 40px rgba(8, 35, 56, 0.24);
+}
+
+.sf-welcome-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px 220px at 92% -10%, rgba(255, 255, 255, 0.2), transparent 70%),
+    radial-gradient(320px 200px at 0% 110%, rgba(255, 255, 255, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
+.sf-welcome-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.sf-welcome-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sf-welcome-hero h1 {
+  margin: 16px 0 10px;
+  color: #ffffff;
+  font-size: 38px;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.sf-welcome-hero p {
+  max-width: 640px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.sf-welcome-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.sf-welcome-chip {
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sf-welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.sf-welcome-feature {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  background: var(--sf-colorNeutralBackground1, #ffffff);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.sf-welcome-feature:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 36, 62, 0.1);
+}
+
+.sf-welcome-feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 18px;
+  background: var(--sf-colorBrandBackground2, #ebf3fc);
+}
+
+.sf-welcome-feature-title {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--sf-colorNeutralForeground1, #1b2430);
+}
+
+.sf-welcome-feature-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--sf-colorNeutralForeground2, #5f6b7a);
+}
+
+.sf-welcome-code {
+  margin: 0;
+  padding: 18px 20px;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: var(--sf-colorNeutralBackground3, #f0f3f7);
+  border: 1px solid var(--sf-colorNeutralStroke2, #d5d9de);
+  color: var(--sf-colorNeutralForeground1, #1b2430);
+  font-family: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.sf-welcome-code .tok-key {
+  color: var(--sf-colorBrandForeground1, #0f6cbd);
+  font-weight: 600;
+}
+
+.sf-welcome-code .tok-str {
+  color: #0a7d55;
+}
+
+.sf-welcome-section-title {
+  margin: 4px 0 -8px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--sf-colorNeutralForeground1, #1b2430);
+}
+
+@media (max-width: 640px) {
+  .sf-welcome {
+    gap: 18px;
+  }
+
+  .sf-welcome-hero {
+    padding: 24px 20px;
+    border-radius: 14px;
+  }
+
+  .sf-welcome-hero h1 {
+    font-size: 26px;
+  }
+
+  .sf-welcome-hero p {
+    font-size: 13px;
+  }
+
+  .sf-welcome-grid {
+    grid-template-columns: 1fr;
+  }
+}

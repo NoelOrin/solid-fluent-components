@@ -1,0 +1,435 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction/API" />
+
+# Solid Fluent Components · API 总览
+
+> 使用 **SolidJS + Vite 8 + TypeScript 7** 重写的 Fluent UI 风格组件库。
+> 本页是组件 API 的单一入口：先看「上手」与「组件总览」，再按左侧分类点开对应 Story 调试。
+
+由于本项目的 Storybook 关闭了 TypeScript docgen（兼容 TS 7），Props 以**本页总表**与各 Story 的 Docs 描述为准；Controls 面板对 `Button` / `Input` / `Badge` / `Avatar` 等支持实时调参。
+
+---
+
+## 上手
+
+### 安装与引入
+
+```tsx
+import {
+  Button,
+  FluentProvider,
+  webLightTheme,
+} from "@solid-fluent/components";
+import "@solid-fluent/components/styles.css";
+```
+
+### 最小用法
+
+```tsx
+import { FluentProvider, webLightTheme, Button } from "@solid-fluent/components";
+
+export function App() {
+  return (
+    <FluentProvider theme={webLightTheme} applyToDocument>
+      <Button appearance="primary">开始使用</Button>
+    </FluentProvider>
+  );
+}
+```
+
+约定：
+
+- 主题通过 `FluentProvider` 注入 CSS 变量（`--sf-*`），所有组件读取这些变量。
+- 大多数控件同时支持**受控**（`value` + `onChange`）与**非受控**（`defaultValue`）两种模式。
+- 事件回调命名尽量贴近 Fluent UI v9，但并非 1:1 兼容。
+- 切换主题：把 `FluentProvider` 的 `theme` 换成 `webDarkTheme` 即可，Storybook 顶部工具栏也提供了 Light / Dark 切换。
+
+---
+
+## 设计令牌速查
+
+`webLightTheme` / `webDarkTheme` 以及 `tokens` 均为普通对象，可直接用于 inline style。
+
+| 用途 | 字段示例 |
+| --- | --- |
+| 品牌主色 | `tokens.colorBrandBackground`、`tokens.colorBrandBackgroundHover` |
+| 中性前景（次要文字） | `tokens.colorNeutralForeground2`、`tokens.colorNeutralForeground3`、`tokens.colorNeutralForeground4` |
+| 中性背景 | `tokens.colorNeutralBackground1`、`tokens.colorNeutralBackground2`、`tokens.colorNeutralBackgroundStatic` |
+| 描边 | `tokens.colorNeutralStroke3`、`tokens.colorNeutralStroke4`、`tokens.colorNeutralStrokeAccessibleHover` |
+| 选中 / 悬停态 | `tokens.colorSubtleBackgroundSelected`、`tokens.colorCompoundBrandBackgroundSelected` |
+| 品牌反色 / 反色前景 | `tokens.colorBrandBackgroundInverted`、`tokens.colorBrandForegroundInverted` |
+| 状态色（info / severe / 成功 / 警告 / 危险） | `tokens.colorStatusInfoForeground1`、`tokens.colorStatusSevereBackground1`、`tokens.colorStatusSuccessBackground2/3`、`tokens.colorStatusWarningForeground2/3`、`tokens.colorStatusDangerBackground2` |
+| 调色板色阶 | `tokens.colorPaletteRedForeground2`、`tokens.colorPaletteGreenBackground3`、`tokens.colorPaletteYellowBorderActive` |
+| 遮罩 / 阴影颜色 | `tokens.colorBackgroundOverlay`、`tokens.colorNeutralShadowAmbient`、`tokens.colorBrandShadowKey` |
+| 字体族 | `tokens.fontFamilyBase`、`tokens.fontFamilyMonospace`、`tokens.fontFamilyNumeric` |
+| 字号 | `tokens.fontSizeBase300`（正文）、`tokens.fontSizeHero800`（大标题） |
+| 字重 | `tokens.fontWeightRegular` / `Medium` / `Semibold` / `Bold` |
+
+> 完整令牌集合以 `Theme` 类型为准；所有新增令牌在 `webLightTheme` / `webDarkTheme` 以及三套主题族的全部 6 个主题中都存在。`colorSubtleBackgroundSelected` 由 `DataGrid` 选中行 CSS 引用，可直接用于行选中背景。
+
+自定义品牌色：
+
+```tsx
+import { createLightTheme, createDarkTheme, brandWeb } from "@solid-fluent/components";
+
+const brand = { ...brandWeb, 100: "#479ef5" /* 覆盖任意档位 */ };
+const theme = createLightTheme(brand);
+```
+
+---
+
+## 组件总览
+
+按左侧 Storybook 侧边栏分类。点击组件名可跳到下方 API；点击 Story 标题进入交互演示。
+
+| 分类 | 组件 |
+| --- | --- |
+| Theme | `FluentProvider`、`tokens`、主题工厂 |
+| Inputs | `Button`、`Input`、`SearchBox`、`Textarea`、`Checkbox`、`Radio`、`RadioGroup`、`Switch`、`SpinButton`、`Select`、`Dropdown`、`ComboboxField`、`Slider`、`Rating` |
+| Display | `Text`(含 `Title`/`Body`/`Caption`)、`Badge`、`PresenceBadge`、`Avatar`、`AvatarGroup`、`Link`、`Divider`、`Image`、`Card`、`Spinner`、`Skeleton`、`ProgressBar` |
+| Feedback | `Dialog`、`Drawer`、`Toast`、`MessageBar` |
+| Navigation | `Menu`、`TabList`、`Accordion`、`Breadcrumb`、`Toolbar`、`Nav`、`Tree`、`Pagination` |
+| Overlay | `Tooltip`、`Popover`、`Overlay`、`TeachingPopover`、`InlineDrawer` |
+| Data | `Table`、`DataGrid`、`List`、`Tag`、`TagPicker`、`SwatchPicker` |
+| Layout / 杂项 | `Stack`、`Portal`、`Field`、`InfoLabel`、`Persona`、`ColorPicker`、`DatePicker`、`TimePicker` |
+
+---
+
+## Theme
+
+### FluentProvider
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `theme` | `Theme` | `webLightTheme` | 传入 `webLightTheme` / `webDarkTheme` 或自定义主题 |
+| `applyToDocument` | `boolean` | `false` | 是否把主题变量写到 `targetDocument.documentElement`（默认 `document`）。多个开启者只有最外层生效；最外层卸载时会把所有权响应式移交给下一个，并清理旧的 CSS 变量 |
+| `targetDocument` | `Document` | `document` | 写入主题变量的目标文档，用于 iframe / 多文档场景；仅在 `applyToDocument` 为 `true` 时使用 |
+| `as` | `keyof JSX.IntrinsicElements` | `"div"` | 替换容器元素标签（如 `section` / `main`），其余行为不变 |
+| `themeOverrides` | `PartialTheme` | - | 在 base 主题上合并覆盖 |
+| `dir` | `"ltr" \| "rtl"` | `"ltr"` | 书写方向 |
+| `style` / `class` | CSS | - | 容器样式 |
+
+### tokens
+
+导出设计令牌对象（颜色、字体、间距等），可直接用于 inline style，例如 `tokens.colorBrandBackground`。新增令牌家族包括 `colorNeutral*` 的 3/4 档与 accessible/on-brand 交互态、`colorBrand*Inverted` / `colorBrandStroke2*` 交互态、`colorCompoundBrand*Selected/Hover/Pressed`、`colorSubtleForeground*` / `colorTransparentStroke*`、`colorStatus{Info,Severe,Success,Warning,Danger}Background2/3` 与 `Foreground2/3`、`colorPalette{Red,Green,Yellow}*` 1/2/3 色阶、`colorBackgroundOverlay` 以及 `colorNeutralShadow*` / `colorBrandShadow*`。
+
+### 三套主题族（web / violet / emerald）
+
+每套主题族都提供完整的 light / dark 主题，均由 `createLightTheme` / `createDarkTheme` 基于对应品牌 ramp 生成，令牌集合完全一致。
+
+| 导出 | 说明 |
+| --- | --- |
+| `type ThemeFamily` | `"web" \| "violet" \| "emerald"` |
+| `type ColorMode` | `"light" \| "dark"` |
+| `themePresetFamilies` | 运行时元信息数组：`Array<{ id, label, light, dark }>`，可直接驱动下拉菜单 |
+| `getThemePreset(family, mode)` | 读取指定族与模式的完整 `Theme` |
+| `resolveThemeFamily(id: string)` | 把工具栏字符串安全转换为 `ThemeFamily`，未知值兜底为 `"web"` |
+| `brandWeb` / `brandViolet` / `brandEmerald` | 三套 10–160 品牌色阶，主色分别为蓝 / 紫（`#6264a7`）/ 绿（`#0b6a4f`） |
+| 具名主题 | `webLightTheme`、`webDarkTheme`、`violetLightTheme`、`violetDarkTheme`、`emeraldLightTheme`、`emeraldDarkTheme` |
+
+```tsx
+import { getThemePreset, resolveThemeFamily, FluentProvider } from "@solid-fluent/components";
+
+const family = resolveThemeFamily(toolbarValue); // 未知值自动回退到 "web"
+<FluentProvider theme={getThemePreset(family, "dark")}>…</FluentProvider>;
+```
+
+主题族预设模块位于 `src/theme/presets/`（`brands.ts` / `presets.ts` / `index.ts`），并通过 `src/theme/index.ts` → 根 `src/index.ts` 的导出链对外暴露。
+
+### 导出主题（一键复制）
+
+`src/theme/export.ts` 提供把任意完整 `Theme` 序列化为可直接粘贴格式的纯函数，同样从包根导出：
+
+| 导出 | 签名 | 说明 |
+| --- | --- | --- |
+| `ThemeExportFormat` | `"json" \| "css" \| "ts"` | 输出格式 |
+| `serializeTheme` | `(theme: Theme, format: ThemeExportFormat, options?: { selector?: string; name?: string }) => string` | `json` 输出完整 token 的 pretty JSON；`css` 复用 `themeToCssVars` 输出 `--sf-*` 变量块（默认 selector `:root`）；`ts` 输出 `export const <name> = { ... } satisfies Theme;`（name 默认 `myTheme`） |
+| `themeToJson` | `(theme: Theme) => string` | `serializeTheme(theme, "json")` 的便捷封装 |
+| `themeToTypescript` | `(theme: Theme, name?: string) => string` | `serializeTheme(theme, "ts", { name })` 的便捷封装 |
+| `copyTextToClipboard` | `(text: string) => Promise<boolean>` | 复制到剪贴板，SSR / 无 `navigator.clipboard` / 被拒绝时返回 `false`（不抛错） |
+
+```tsx
+import { serializeTheme, copyTextToClipboard, getThemePreset } from "@solid-fluent/components";
+
+const theme = getThemePreset("violet", "dark");
+await copyTextToClipboard(serializeTheme(theme, "css"));
+```
+
+`ThemeFamilies` Story 里提供了「复制 JSON / 复制 CSS / 复制 TS」按钮演示。
+
+---
+
+## Inputs
+
+### Button
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `appearance` | `"primary" \| "secondary" \| "outline" \| "subtle" \| "transparent"` | `"secondary"` | 视觉样式 |
+| `size` | `"small" \| "medium" \| "large"` | `"medium"` | 尺寸 |
+| `shape` | `"rounded" \| "circular" \| "square"` | `"rounded"` | 形状 |
+| `icon` | `JSX.Element` | - | 图标 |
+| `iconPosition` | `"before" \| "after"` | `"before"` | 图标位置 |
+| `disabled` / `disabledFocusable` | `boolean` | `false` | 禁用 / 禁用但可聚焦 |
+| `children` | `JSX.Element` | - | 按钮文本 |
+
+### Input / SearchBox / Textarea
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Input` | `size`、`contentBefore`/`contentAfter`、`invalid`、`disabled`，其余透传原生 `input` |
+| `SearchBox` | `value`/`onInput`、`onDismiss`、`size`、`appearance`、`contentBefore`/`contentAfter` |
+| `Textarea` | 同 `Input` 思路，透传原生 `textarea` |
+
+### Field
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `label` | `JSX.Element` | - | 标签（自动关联子控件 id） |
+| `hint` | `JSX.Element` | - | 帮助文案 |
+| `validationMessage` | `JSX.Element` | - | 校验信息 |
+| `validationState` | `"error" \| "warning" \| "success" \| "none"` | `"none"` | 校验状态 |
+| `required` | `boolean` | `false` | 必填标记 |
+| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | 布局方向 |
+| `children` | `JSX.Element` | - | 子控件（`Input`/`Select`/`Textarea` 读取其上下文 id） |
+
+### Checkbox / Radio / Switch
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Checkbox` | `label`、`checked`、`size`、`indicator`、`disabled`、原生 `onChange` |
+| `Radio` / `RadioGroup` | `label`、`checked`、`name`、`disabled` |
+| `Switch` | `label`、`labelPosition`、`checked`、`disabled` |
+
+### SpinButton / Rating / Slider
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `SpinButton` | `value`/`defaultValue`、`min`/`max`/`step`/`precision`、`onChange(value, displayValue)` |
+| `Rating` | `value`/`defaultValue`、`max`、`step(0.5\|1)`、`size`、`color`、`readOnly`、`disabled`、`onChange` |
+| `Slider` | `value`/`defaultValue`、`min`/`max`/`step`、`onChange`、`disabled` |
+
+### Dropdown / ComboboxField / Select
+
+**Dropdown**
+
+| 属性 | 说明 |
+| --- | --- |
+| `options` | `{ value, label, disabled?, text? }[]` |
+| `value` / `defaultValue` | 当前值 |
+| `onOptionSelect` | `{ value, option }` |
+| `placeholder` / `disabled` | 占位与禁用 |
+
+**ComboboxField**
+
+| 属性 | 说明 |
+| --- | --- |
+| `options` | `{ value, label, disabled? }[]` |
+| `multiselect` | 多选 |
+| `selectedOptions` / `defaultSelectedOptions` | 多选值 |
+| `open` / `defaultOpen` / `onOpenChange` | 展开状态 |
+| `clearable` / `freeform` | 清空 / 自由输入 |
+| `onOptionSelect` | `{ value, selectedOptions, optionValue?, optionText? }` |
+| `onInput` | 输入过滤 |
+
+**Select**：原生 `<select>` 封装，属性与原生一致。
+
+---
+
+## Display
+
+### Text 与排版别名
+
+`Text` 支持通过 `as` 渲染任意语义标签；`Title1-3` / `Subtitle1-2` / `Body1-2` / `Caption1-2` 是预设 `as`+`size`+`weight` 的快捷组件。
+
+| 属性 | 类型 | 默认 | 说明 |
+| --- | --- | --- | --- |
+| `as` | `"span"\|"p"\|"h1"…"h6"\|"label"\|"div"` | `"span"` | 语义标签（用 `Dynamic` 渲染，支持字符串与组件） |
+| `size` | `100-1000` | `300` | 字号档位 |
+| `weight` | `"regular"\|"medium"\|"semibold"\|"bold"` | `"regular"` | 字重 |
+| `align` | `"start"\|"center"\|"end"\|"justify"` | - | 对齐 |
+| `truncate` / `block` / `wrap` | `boolean` | - | 截断 / 块级 / 不换行 |
+| `italic` / `underline` / `strikethrough` | `boolean` | - | 文本修饰 |
+| `font` | `"base"\|"numeric"\|"monospace"` | - | 字体族 |
+
+### Badge / PresenceBadge
+
+| 属性 | 类型 | 默认 |
+| --- | --- | --- |
+| `appearance` | `filled \| ghost \| outline \| tint` | `filled` |
+| `color` | `brand \| danger \| important \| informative \| severe \| subtle \| success \| warning` | `brand` |
+| `size` | `tiny \| extra-small \| small \| medium \| large \| extra-large` | `medium` |
+| `shape` | `circular \| rounded \| square` | `circular` |
+| `count` / `overflowCount` / `dot` / `showZero` | CounterBadge 专用 | - |
+
+### Avatar / Persona
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Avatar` | `name`、`image`、`size(16-128)`、`color`、`shape`、`initials`、`icon` |
+| `Persona` | `name`、`secondaryText`、`tertiaryText`、`size`、`avatar`、`presence` |
+| `AvatarGroup` | `items` 或 `children`，溢出折叠 |
+
+### Card
+
+| 属性 | 说明 |
+| --- | --- |
+| `appearance` | `filled` / `filled-alternative` / `outline` / `subtle` |
+| `size` | `small` / `medium` / `large` |
+| `orientation` | `vertical` / `horizontal` |
+| 子组件 | `CardHeader`、`CardPreview`、`CardFooter` |
+
+### Spinner / ProgressBar / Image / Skeleton
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Spinner` | `size`、`label`、`labelPosition`、`appearance` |
+| `ProgressBar` | `value`、`max`、`thickness`、`shape`、`color` |
+| `Image` | `src`、`shape`、`fit`、`bordered`、`shadow`、`width`/`height` |
+| `Skeleton` | `appearance`、`width`、`height`、`<SkeletonItem>` 组合 |
+
+---
+
+## Feedback
+
+### Dialog
+
+| 属性 | 说明 |
+| --- | --- |
+| `open` / `defaultOpen` / `onOpenChange` | 开关控制 |
+| `modalType` | `modal` / `non-modal` / `alert`（`alert` 禁止点遮罩关闭与 Esc） |
+| 结构组件 | `DialogTrigger`、`DialogSurface`、`DialogTitle`、`DialogBody`、`DialogActions`、`DialogContent` |
+
+`DialogContent` 快捷属性：`title`、`actions`、`onClose`。
+
+### Drawer / Toast / MessageBar
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Drawer` | `open`/`onOpenChange`、`position(start\|end)`、`size`、`modalType` |
+| `Toast` | `Toaster` 容器 + `dispatchToast` / `dismissToast` / `clearToasts`；`intent: info\|success\|warning\|error` |
+| `MessageBar` | `intent` + `MessageBarBody` / `MessageBarTitle` / `MessageBarActions` |
+
+Toast 用法：
+
+```tsx
+const id = dispatchToast({ intent: "success", title: "已保存", body: "操作成功", timeout: 4000 });
+dismissToast(id);
+```
+
+---
+
+## Navigation / Overlay
+
+### Menu
+
+```tsx
+<Menu>
+  <MenuTrigger><Button>打开</Button></MenuTrigger>
+  <MenuPopover>
+    <MenuList>
+      <MenuItem>新建</MenuItem>
+      <MenuItem disabled>分享</MenuItem>
+    </MenuList>
+  </MenuPopover>
+</Menu>
+```
+
+| 属性 | 说明 |
+| --- | --- |
+| `open` / `defaultOpen` / `onOpenChange` | 开关 |
+| 子组件 | `MenuItem`、`MenuItemCheckbox`、`MenuItemRadio`、`MenuDivider`、`MenuGroup` |
+
+### Tooltip / Popover / Overlay
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `Tooltip` | `content`、`positioning`、`withArrow`、`visible`、`relationship` |
+| `Popover` | `PopoverTrigger` + `PopoverSurface` |
+| `SimplePopover` | `content` 快捷用法 |
+| `Overlay` | 遮罩容器，`isRelative`、点击关闭 |
+
+### Tab / Accordion / Breadcrumb / Toolbar / Nav / Tree / Pagination
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `TabList` | `items: { value, label, content, disabled? }[]` |
+| `Accordion` | `multiple`、`openItems`/`defaultOpenItems` |
+| `Breadcrumb` | `items: { children, href?, current? }[]` |
+| `Toolbar` | `ToolbarButton`、`ToolbarDivider` |
+| `Nav` | `items`、`selectedValue`、`onValueChange` |
+| `Tree` | `items`、`openItems`、`selectedItems`、`selectionMode`、`onSelect` |
+| `Pagination` | `page`、`pageCount`、`onPageChange` |
+
+---
+
+## Data / Layout
+
+### Table / DataGrid
+
+结构式表格：`Table` / `TableHeader` / `TableBody` / `TableRow` / `TableHeaderCell` / `TableCell`。
+
+`DataGrid`：
+
+| 属性 | 说明 |
+| --- | --- |
+| `items` / `columns` | 数据与列定义 |
+| `getRowId` | 行 ID |
+| `sortable` | 排序 |
+| `selectionMode` | `none` / `single` / `multiselect` |
+| `selectedItems` / `onSelectionChange` | 选择 |
+| `virtualized` / `height` / `rowHeight` | 虚拟滚动 |
+
+列定义 `DataGridColumnDef`：`columnId`、`label`、`width`、`compare`、`renderCell`、`renderHeaderCell`。
+
+### List / Stack
+
+| 组件 | 关键属性 |
+| --- | --- |
+| `List` | `items`、`selectionMode`、`selectedItems`、`onSelectionChange` |
+| `Stack` | `horizontal`/`reversed`/`wrap`、`verticalAlign`/`horizontalAlign`、`tokens.childrenGap`/`tokens.padding`；`StackItem` 支持 `grow`/`disableShrink`/`align` |
+
+### 选择器补充
+
+| 组件 | 关键 API |
+| --- | --- |
+| `Tag` / `TagPicker` | `appearance`、`size`、`shape`、`dismissible`/`onDismiss`；`TagPicker`: `options`、`selectedOptions`、`onOptionSelect`、`placeholder` |
+| `SwatchPicker` | `items`、`value`、`onSelectionChange` |
+| `ColorPicker` | `color`、`onColorChange`，以及 `ColorArea` / `ColorSlider` / `AlphaSlider` |
+| `DatePicker` / `DateRangePicker` | `value`、`onSelectDate` / `onSelectRange` |
+| `TimePicker` | `value`、`minuteStep`、`onTimeChange` |
+| `Calendar` / `CalendarDateRange` | 日历本体 |
+
+---
+
+## 常见模式
+
+### 受控与非受控
+
+```tsx
+// 非受控：给初值，组件内部维护状态
+<Input defaultValue="hello" />
+
+// 受控：自己持有状态
+const [v, setV] = createSignal("");
+<Input value={v()} onInput={(e) => setV(e.currentTarget.value)} />
+```
+
+### Field 联动
+
+`Field` 会自动把 `label` 与 `hint` 关联到内部控件（通过 context 注入 `id`/`aria-*`）：
+
+```tsx
+<Field label="邮箱" hint="用于登录" validationState="none">
+  <Input type="email" />
+</Field>
+```
+
+---
+
+## 已知限制
+
+- TypeScript docgen 已关闭（兼容 TS 7），因此本页与各 Story Docs 是 Props 的权威来源。
+- 并非所有 Fluent UI v9 的 Props 都 1:1 实现，新增组件与字段以本仓库源码为准（`src/components`）。
+- 部分深度交互（虚拟表格、日期范围、键盘导航）集中在 `Polish` 与 `Complete` 分类演示。
