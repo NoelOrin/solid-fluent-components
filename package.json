@@ -1,6 +1,6 @@
 {
   "name": "@solid-fluent/components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "packageManager": "pnpm@10.7.0",
   "description": "SolidJS rewrite of @fluentui/react-components",
   "author": "NoelOrin <noelorin@outlook.com>",
