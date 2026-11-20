@@ -1,8 +1,8 @@
 name: CI
 
 # Pull-request gate for the component library: every change must typecheck,
-# pass its vitest suite and produce a library build. Storybook is built at
-# release time (see release.yml), not on every PR.
+# pass its vitest suite, produce a library build and build Storybook (the
+# docs site that ships to GitHub Pages via pages.yml).
 
 on:
   push:
@@ -48,3 +48,6 @@ jobs:
 
       - name: Build library
         run: pnpm build
+
+      - name: Build Storybook
+        run: pnpm build-storybook

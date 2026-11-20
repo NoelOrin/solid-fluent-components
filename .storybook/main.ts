@@ -6,6 +6,13 @@ import remarkGfm from "remark-gfm";
 
 const srcEntry = fileURLToPath(new URL("../src/index.ts", import.meta.url));
 
+// GitHub Pages serves project sites under /<repo>/. Storybook's static output
+// uses absolute asset paths by default, so set Vite's base only for Pages
+// builds (GITHUB_PAGES=1) and keep local builds at the root.
+const ghPages = process.env.GITHUB_PAGES === "1";
+const repo = process.env.GITHUB_REPOSITORY?.split("/")[1] ?? "solid-fluent-components";
+const pagesBase = ghPages ? `/${repo}/` : undefined;
+
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
   addons: [
@@ -31,6 +38,7 @@ framework: {
   },
   async viteFinal(config) {
     return mergeConfig(config, {
+      ...(pagesBase ? { base: pagesBase } : {}),
       plugins: [solid()],
       resolve: {
         alias: {

@@ -1,6 +1,12 @@
 # Solid Fluent Components
 
+[![CI](https://github.com/NoelOrin/solid-fluent-components/actions/workflows/ci.yml/badge.svg)](https://github.com/NoelOrin/solid-fluent-components/actions/workflows/ci.yml)
+[![Pages](https://github.com/NoelOrin/solid-fluent-components/actions/workflows/pages.yml/badge.svg)](https://noelorin.github.io/solid-fluent-components/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 用 **SolidJS** 重写的 Fluent UI 风格组件库，对标 `@fluentui/react-components` 的主题与常用 API。
+
+**在线 Storybook（GitHub Pages）**：https://noelorin.github.io/solid-fluent-components/
 
 ## 技术栈
 
@@ -80,10 +86,12 @@ playground/       # 本地演示
 
 ## Storybook
 
+- 在线文档（GitHub Pages）：https://noelorin.github.io/solid-fluent-components/ ，每次 push 到 `main` 由 `.github/workflows/pages.yml` 自动构建并发布；PR 上 `.github/workflows/ci.yml` 也会构建一次做门禁。
 - 框架：`storybook-solidjs-vite` + Storybook 10
 - 主题切换：工具栏 Light / Dark
 - API 说明：`Introduction/API`（MDX 总表）+ 各组件 Story 的 Docs 描述 / Controls
 - 兼容说明：项目编译使用 TypeScript 7；`storybook-solidjs-vite` 的 docgen 依赖 TypeScript 5 API，因此通过 `scripts/pin-storybook-typescript.mjs` 为其固定 TS 5.9，并关闭 docgen。
+- Pages 构建会设置 `GITHUB_PAGES=1`，由 `.storybook/main.ts` 把 Vite `base` 改为 `/<repo>/`，保证子路径部署时静态资源可寻址；本地 `pnpm storybook` 仍走根路径。
 
 ## 国际化（i18n）
 
