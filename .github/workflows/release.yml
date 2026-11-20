@@ -20,6 +20,9 @@ concurrency:
 
 permissions:
   contents: write
+  # changesets/action 创建 Version Packages PR 需要 pull-requests: write；
+  # 只有 contents: write 能推分支但开不了 PR（Resource not accessible by integration）。
+  pull-requests: write
 
 jobs:
   release:
